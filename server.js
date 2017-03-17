@@ -1,17 +1,16 @@
 //An asynchronous server that serves static files
 
 // load necessary modules
-var http = require('http');
+var http = require('http').createServer(handleRequest);
+var io = require('socket.io')(http);
 var fs = require('fs');
 var mime = require('mime-types');
 var url = require('url');
-var io = require('socket.io')(http);
-
 const ROOT = "./public_html";
 
 // create http server
-var server = http.createServer(handleRequest); 
-server.listen(2406);
+
+http.listen(2406);
 console.log('Server listening on port 2406');
 
 function handleRequest(req, res) {
