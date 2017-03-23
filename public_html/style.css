@@ -1,8 +1,33 @@
+#contents{
+	width:100%;
+	min-height: 200px;
+	margin-bottom: :10px;
+}
+
+#chatLogDiv{
+	float:left;
+	margin-right: 15px;
+	margin-bottom: 15px;
+	width: 80%;
+	height: 200px;
+}
+
+#userListDiv{
+	border: solid 1px black;
+	margin-bottom: 15px;
+	/*margin:10px;*/
+	height:100%;
+	overflow: auto;
+	list-style-type:none;
+	height: 200px;
+}
+
+
 #inputText, #chatLog{
-			border: solid 1px black;
-			width: 100%;
-		}	
-			
-		#chatLog{
-			height: 200px;
-		}
+	border: solid 1px black;
+	width: 100%;
+}	
+
+#chatLog{
+	height: 200px;
+}

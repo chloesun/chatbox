@@ -2,7 +2,7 @@ $(document).ready(function(){
 		
 			var userName = prompt("What's your name?")||"User";
 			
-			var socket = io(localhost:2406); //connect to the server that sent this page
+			var socket = io(); //connect to the server that sent this page
 			socket.on('connect', function(){
 				socket.emit("intro", userName);
 			});

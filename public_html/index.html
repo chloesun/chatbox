@@ -10,13 +10,22 @@
 </head>
 
 <body>
-	
-	<textarea id="chatLog"></textarea>
-	<input id="inputText">	
+	<div id="contents">
+		<div id="chatLogDiv">
+			<textarea id="chatLog"></textarea>
+	<!-- 		<input id="inputText"> -->
+		</div>
 
-	<hr/>
-	<input id="userInput"/>
-	<button id="goButton">Send</button> <hr/>
+		<div id="userListDiv">
+			<h3>Users</h3>
+			<ul id="userList">		
+			</ul>
+		</div>
+	</div>
+
+	
+	<input id="inputText" placeholder="Type message, press enter...">
+
 	<table id="messageLog"> <tr><th>#</th><th>Text</th></tr> </table>
 </body>
 
