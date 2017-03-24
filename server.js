@@ -7,6 +7,8 @@ var fs = require('fs');
 var mime = require('mime-types');
 var url = require('url');
 const ROOT = "./public_html";
+var users = [];
+var clients =[];
 
 // create http server
 
@@ -22,14 +24,14 @@ function handleRequest(req, res) {
 	var urlObj = url.parse(req.url,true);
 	var filename = ROOT+urlObj.pathname;
 
-		
+
 	//the callback sequence for static serving...
 	fs.stat(filename,function(err, stats){
 		if(err){   //try and open the file and handle the error, handle the error
 			respondErr(err);
 		}else{
 			if(stats.isDirectory())	filename+="/index.html";
-		
+
 			fs.readFile(filename,"utf8",function(err, data){
 				if(err)respondErr(err);
 				else respond(200,data);
@@ -45,7 +47,7 @@ function handleRequest(req, res) {
 			else respond(404,data);
 		});
 	}
-		
+
 	//locally defined helper function
 	//responds in error, and outputs to the console
 	function respondErr(err){
@@ -56,7 +58,7 @@ function handleRequest(req, res) {
 			respond(500,err.message);
 		}
 	}
-		
+
 	//locally defined helper function
 	//sends off the response message
 	function respond(code, data){
@@ -70,24 +72,60 @@ function handleRequest(req, res) {
 
 
 io.on("connection", function(socket){
-	console.log("Got a connection");
-	var username;
+	//clients.push(socket);
+	console.log("Got a connection", clients.length);
+
+
 	socket.on("intro",function(data){
-		username = data;
-		socket.broadcast.emit("message", timestamp()+": "+username+" has entered the chatroom.");
-		socket.emit("message","Welcome, "+username+".");
+		clients.push(socket);
+		socket.username = data;
+		users = getUserList();
+		console.log(users);
+		io.emit("userList", users);
+		socket.broadcast.emit("message", timestamp()+": "+socket.username+" has entered the chatroom.");
+		socket.emit("message","Welcome, "+socket.username+".");
 	});
 
+	//send message
 	socket.on("message", function(data){
 		console.log("got message: "+data);
-		socket.broadcast.emit("message",timestamp()+", "+username+": "+data);
+		socket.broadcast.emit("message",timestamp()+", "+socket.username+": "+data);
 		
 	});
 
-	socket.on("disconnect", function(){
-		console.log(username+" disconnected");
-		io.emit("message", timestamp()+": "+username+" disconnected.");
+    //disconnect
+    socket.on("disconnect", function(){
+    	console.log(socket.username+" disconnected");
+    	//users.splice(users.indexOf(socket.username),1);
+        // to remove a user from the list
+    	clients = clients.filter(function(ele){  
+    		return ele!==socket;
+    	});
+    	updateUsernames();
+		io.emit("message", timestamp()+": "+socket.username+" disconnected.");
 	});
+
+	//new user
+	socket.on("new user", function(data, callback){
+		callback(true);
+		socket.username = data;
+		//clients.push(socket);
+		//users.push(data);
+		updateUsernames();
+	})
+
+	function updateUsernames(){
+		users = getUserList();
+		io.emit("userList", users);
+	}
+
+	function getUserList(){
+		var ret = [];
+		for(var i=0;i<clients.length;i++){
+			ret.push(clients[i].username);
+		}
+		return ret;
+	}
 	
 });
 
