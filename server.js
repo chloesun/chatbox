@@ -6,6 +6,7 @@ var io = require('socket.io')(http);
 var fs = require('fs');
 var mime = require('mime-types');
 var url = require('url');
+var util = require('util');
 const ROOT = "./public_html";
 var users = [];
 var clients =[];
@@ -89,8 +90,7 @@ io.on("connection", function(socket){
 	//send message
 	socket.on("message", function(data){
 		console.log("got message: "+data);
-		socket.broadcast.emit("message",timestamp()+", "+socket.username+": "+data);
-		
+		socket.broadcast.emit("message",timestamp()+", "+socket.username+": "+data);		
 	});
 
     //disconnect
@@ -98,12 +98,12 @@ io.on("connection", function(socket){
     	console.log(socket.username+" disconnected");
     	//users.splice(users.indexOf(socket.username),1);
         // to remove a user from the list
-    	clients = clients.filter(function(ele){  
-    		return ele!==socket;
-    	});
-    	updateUsernames();
-		io.emit("message", timestamp()+": "+socket.username+" disconnected.");
-	});
+        clients = clients.filter(function(ele){  
+        	return ele!==socket;
+        });
+        updateUsernames();
+        io.emit("message", timestamp()+": "+socket.username+" disconnected.");
+    });
 
 	//new user
 	socket.on("new user", function(data, callback){
@@ -113,6 +113,21 @@ io.on("connection", function(socket){
 		//users.push(data);
 		updateUsernames();
 	})
+
+	//privateMessage
+	socket.on("privateMessage", function(data){
+		console.log("private message: " + util.inspect(data, false, null));
+		console.log(util.inspect(clients, { showHidden: true, depth: 2 }));
+		privateClients = clients.filter(function(client){
+			if(client.username === data.username) return true;
+			else return false
+		});
+
+		privateClients.map(function(privateClient){
+			privateClient.emit("message",timestamp()+", "+socket.username+": "+data.message);
+		});
+	});
+
 
 	function updateUsernames(){
 		users = getUserList();

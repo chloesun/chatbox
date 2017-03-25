@@ -1,3 +1,8 @@
+*{
+	background: #d0daea;
+	font-family: "Times New Roman", Times, serif;
+}
+
 #contents{
 	width:100%;
 	min-height: 200px;
@@ -33,7 +38,7 @@
 	height: 300px;
 }
 
-#userItem{
+.userItem{
 	list-style-type: none;
-
+	cursor:pointer;
 }
